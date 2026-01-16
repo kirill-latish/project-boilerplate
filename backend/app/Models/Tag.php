@@ -4,14 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Record extends BaseModel
+class Tag extends BaseModel
 {
 
 
     protected $fillable = [
-        'title',
-        'description',
-        'recorded_at',
+        'name',
     ];
 
     protected $casts = [
@@ -20,10 +18,10 @@ class Record extends BaseModel
     public static function getRules($id = null)
     {
         return [
-            'title' => 'string|required',
-            'description' => 'string|nullable',
-            'recorded_at' => 'date|required',
+            'name' => 'string|required',
         ];
     }
     //
 }
+
+
