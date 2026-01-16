@@ -30,7 +30,6 @@ class ApiTest extends TestCase
 
         // filter only index endpoints
         $apiIndexRoutes = array_filter($apiRoutes, function ($route) {
-            // add filter for excluding cashboxes.index
             return str_contains($route->getName(), 'index');
         });
 

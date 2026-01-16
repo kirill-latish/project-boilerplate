@@ -10,26 +10,21 @@ use \App\Http\Controllers\TagController as TagController;
 use \App\Http\Controllers\RecordTagController as RecordTagController;
 use \App\Http\Controllers\RegisterController as RegisterController;
 use \App\Http\Controllers\PasswordController as PasswordController;
+use \App\Http\Controllers\ReviewController as ReviewController;
+use \App\Http\Controllers\MeController as MeController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::middleware('auth:sanctum')->get('/me', [MeController::class,'show']);
+Route::middleware('auth:sanctum')->post('/me', [MeController::class,'update']);
 
 Route::post('login', [RegisterController::class,'login']);
 Route::post('register', [RegisterController::class,'register']);
 Route::post('password/reset', [PasswordController::class,'sendResetLink']);
 Route::post('password/reset/confirm', [PasswordController::class,'reset']);
 
-
-
 Route::middleware(['auth:sanctum'])->resource('records', RecordController::class)->except(['edit']);
-
-Route::middleware([])->resource('articles', ArticleController::class)->except(['edit']);
-
-Route::middleware([])->resource('activity-logs', ActivityLogController::class)->except(['edit']);
-
-Route::middleware([])->resource('rollouts', RolloutController::class)->except(['edit']);
-
-Route::middleware([])->resource('tags', TagController::class)->except(['edit']);
-
-Route::middleware([])->resource('record-tags', RecordTagController::class)->except(['edit']);
+Route::middleware(['auth:sanctum'])->resource('articles', ArticleController::class)->except(['edit']);
+Route::middleware(['auth:sanctum'])->resource('activity-logs', ActivityLogController::class)->except(['edit']);
+Route::middleware(['auth:sanctum'])->resource('rollouts', RolloutController::class)->except(['edit']);
+Route::middleware(['auth:sanctum'])->resource('tags', TagController::class)->except(['edit']);
+Route::middleware(['auth:sanctum'])->resource('record-tags', RecordTagController::class)->except(['edit']);
+Route::middleware(['auth:sanctum'])->resource('reviews', ReviewController::class)->except(['edit']);

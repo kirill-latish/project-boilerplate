@@ -81,5 +81,13 @@
     "Storage": "Сховище",
     "Entity Table": "Таблиця сутностей",
     "Entity": "Сутність",
-    "Mime Type": "MIME Тип"
+    "Mime Type": "MIME Тип",
+    "Reviews retrieved successfully": "Відгуки успішно отримано",
+    "Review created successfully": "Відгук успішно створено",
+    "Review not found": "Відгук не знайдено",
+    "Review retrieved successfully": "Відгук успішно отримано",
+    "Review updated successfully": "Відгук успішно оновлено",
+    "Review deleted successfully": "Відгук успішно видалено",
+    "Rating": "Рейтинг",
+    "Comment": "коментар"
 }
