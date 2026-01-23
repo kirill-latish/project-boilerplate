@@ -38,5 +38,9 @@ class DatabaseSeeder extends Seeder
             }
             User::factory()->create($input);
         }
+
+        $this->call([
+            PricingPlansSeeder::class,
+        ]);
     }
 }

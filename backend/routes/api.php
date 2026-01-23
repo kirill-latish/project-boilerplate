@@ -12,6 +12,7 @@ use \App\Http\Controllers\RegisterController as RegisterController;
 use \App\Http\Controllers\PasswordController as PasswordController;
 use \App\Http\Controllers\ReviewController as ReviewController;
 use \App\Http\Controllers\MeController as MeController;
+use \App\Http\Controllers\PricingPlanController as PricingPlanController;
 
 Route::middleware('auth:sanctum')->get('/me', [MeController::class,'show']);
 Route::middleware('auth:sanctum')->post('/me', [MeController::class,'update']);
@@ -28,3 +29,10 @@ Route::middleware(['auth:sanctum'])->resource('rollouts', RolloutController::cla
 Route::middleware(['auth:sanctum'])->resource('tags', TagController::class)->except(['edit']);
 Route::middleware(['auth:sanctum'])->resource('record-tags', RecordTagController::class)->except(['edit']);
 Route::middleware(['auth:sanctum'])->resource('reviews', ReviewController::class)->except(['edit']);
+
+// Public pricing plans routes
+Route::get('pricing-plans', [PricingPlanController::class, 'index']);
+Route::get('pricing-plans/{id}', [PricingPlanController::class, 'show']);
+
+// Protected pricing plans routes (for admin operations)
+Route::middleware(['auth:sanctum'])->resource('pricing-plans', PricingPlanController::class)->except(['index', 'show', 'edit']);
