@@ -13,6 +13,7 @@ use \App\Http\Controllers\PasswordController as PasswordController;
 use \App\Http\Controllers\ReviewController as ReviewController;
 use \App\Http\Controllers\MeController as MeController;
 use \App\Http\Controllers\PricingPlanController as PricingPlanController;
+use App\Http\Controllers\BaseController as BaseController;
 
 Route::middleware('auth:sanctum')->get('/me', [MeController::class,'show']);
 Route::middleware('auth:sanctum')->post('/me', [MeController::class,'update']);
@@ -22,8 +23,13 @@ Route::post('register', [RegisterController::class,'register']);
 Route::post('password/reset', [PasswordController::class,'sendResetLink']);
 Route::post('password/reset/confirm', [PasswordController::class,'reset']);
 
+Route::middleware([])->get('filters', [BaseController::class,'getAvailableFilers']);
+Route::middleware([])->get('filter-options', [BaseController::class,'getFilterOptions']);
+Route::middleware([])->get('columns', [BaseController::class,'getAvailableColumns']);
+
+
 Route::middleware(['auth:sanctum'])->resource('records', RecordController::class)->except(['edit']);
-Route::middleware(['auth:sanctum'])->resource('articles', ArticleController::class)->except(['edit']);
+Route::middleware([])->resource('articles', ArticleController::class)->except(['edit']);
 Route::middleware(['auth:sanctum'])->resource('activity-logs', ActivityLogController::class)->except(['edit']);
 Route::middleware(['auth:sanctum'])->resource('rollouts', RolloutController::class)->except(['edit']);
 Route::middleware(['auth:sanctum'])->resource('tags', TagController::class)->except(['edit']);

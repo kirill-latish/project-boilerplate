@@ -17,6 +17,7 @@ class ArticleController extends BaseController
      */
     public function index(Request $request): JsonResponse
     {
+
         $query = Article::query();
 
         [$perPage, $page, $fieldsToSelect, $searchStr, $from] = $this->buildParamsFromRequest($request, $query);

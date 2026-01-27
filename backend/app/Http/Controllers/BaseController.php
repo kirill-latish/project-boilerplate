@@ -370,6 +370,80 @@ class BaseController extends Controller
         return $this->sendResponse(['filters' => $filters], null);
     }
 
+    public function getAvailableColumns(Request $request)
+    {
+        // if there is no class in request then extract class from controller name
+        $class = $request->get('class', null);
+
+        if (is_null($class) || empty($class)) {
+            return $this->sendError(trans('Class not specified'), [], 400);
+        }
+
+        $originalClass = $class;
+
+        // Ensure class is not empty before constructing full class name
+        if (empty($class)) {
+            return $this->sendError(trans('Invalid class name'), [], 400);
+        }
+
+        $class = 'App\Models\\' . $class;
+
+        if (!((new $class) instanceof BaseModel) && !(new $class) instanceof User) {
+            return $this->sendError(trans('Class not found'), [], 400);
+        }
+
+        $fillableFields = (new $class())->getFillable();
+
+        // Add common fields
+        if ($class != 'App\\Models\\User' && $class::hasTimestamps()) {
+            $fillableFields[] = 'created_at';
+            $fillableFields[] = 'updated_at';
+        }
+
+        $fillableFields[] = 'id';
+
+        // Remove duplicates and sort
+        $fillableFields = array_unique($fillableFields);
+        sort($fillableFields);
+
+        $columns = [];
+        $model = new $class();
+        $addedKeys = [];
+
+        foreach ($fillableFields as $field) {
+            $key = $field;
+            $label = $field;
+
+            // Handle relation fields (e.g., user_id -> user)
+            if (str_ends_with($label, '_id')) {
+                $relationName = substr($label, 0, -3);
+                $relationMethod = \Str::camel($relationName);
+                
+                // Check if there's a corresponding relation method
+                if (method_exists($model, $relationMethod)) {
+                    // Use the relation name as the key instead of the _id field
+                    $key = $relationName;
+                    $label = $relationName;
+                }
+            }
+
+            // Convert snake_case to Title Case
+            $label = str_replace('_', ' ', $label);
+            $label = ucwords($label);
+
+            // Only add if we haven't added this key already
+            if (!in_array($key, $addedKeys)) {
+                $columns[] = [
+                    'key' => $key,
+                    'label' => $label,
+                ];
+                $addedKeys[] = $key;
+            }
+        }
+
+        return $this->sendResponse(['columns' => $columns], null);
+    }
+
     public function getFilterOptions(Request $request)
     {
         // if there is no class in request then extract class from controller name
@@ -436,10 +510,6 @@ class BaseController extends Controller
             $relationName = substr($field, 0, -3);
             $relationName = \Str::camel($relationName);
 
-            if ($field == 'make_id') {
-                $relationName = 'carMake';
-            }
-
             if (method_exists($class, $relationName)) {
                 // Subquery for distinct values
                 $extendedOptionsQuery = $class::query()
@@ -465,14 +535,19 @@ class BaseController extends Controller
                         ->first();
 
 
-                    if ($relatedModel && $relatedModel->$relationName && (is_null($search) || stripos(
-                                $relatedModel->$relationName->getName(),
-                                $search
-                            ) !== false)) {
-                        $options[] = [
-                            'id' => $relatedModel->$field,
-                            'name' => $relatedModel->$relationName->getName()
-                        ];
+                    if ($relatedModel && $relatedModel->$relationName) {
+                        $related = $relatedModel->$relationName;
+                        // Try to get name - check for getName() method first, then fallback to name attribute
+                        $name = method_exists($related, 'getName') 
+                            ? $related->getName() 
+                            : ($related->name ?? $related->title ?? $related->email ?? (string)$related->id);
+                        
+                        if (is_null($search) || stripos($name, $search) !== false) {
+                            $options[] = [
+                                'id' => $relatedModel->$field,
+                                'name' => $name
+                            ];
+                        }
                     }
                 }
             }
