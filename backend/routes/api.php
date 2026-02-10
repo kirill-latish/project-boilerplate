@@ -14,9 +14,17 @@ use \App\Http\Controllers\ReviewController as ReviewController;
 use \App\Http\Controllers\MeController as MeController;
 use \App\Http\Controllers\PricingPlanController as PricingPlanController;
 use App\Http\Controllers\BaseController as BaseController;
+use App\Http\Controllers\TranslationsController as TranslationsController;
+use App\Http\Controllers\AuthController as AuthController;
 
 Route::middleware('auth:sanctum')->get('/me', [MeController::class,'show']);
 Route::middleware('auth:sanctum')->post('/me', [MeController::class,'update']);
+
+// Separate Google OAuth routes for sign-in and sign-up
+Route::get('auth/google/signin', [AuthController::class, 'redirectToGoogleSignIn']);
+Route::get('auth/google/signin/callback', [AuthController::class, 'handleGoogleSignInCallback']);
+Route::get('auth/google/signup', [AuthController::class, 'redirectToGoogleSignUp']);
+Route::get('auth/google/signup/callback', [AuthController::class, 'handleGoogleSignUpCallback']);
 
 Route::post('login', [RegisterController::class,'login']);
 Route::post('register', [RegisterController::class,'register']);
@@ -26,6 +34,7 @@ Route::post('password/reset/confirm', [PasswordController::class,'reset']);
 Route::middleware([])->get('filters', [BaseController::class,'getAvailableFilers']);
 Route::middleware([])->get('filter-options', [BaseController::class,'getFilterOptions']);
 Route::middleware([])->get('columns', [BaseController::class,'getAvailableColumns']);
+Route::middleware([])->get('translations/{lang}', [TranslationsController::class,'show']);
 
 
 Route::middleware(['auth:sanctum'])->resource('records', RecordController::class)->except(['edit']);
