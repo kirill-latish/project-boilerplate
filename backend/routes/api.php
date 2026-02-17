@@ -16,6 +16,10 @@ use \App\Http\Controllers\PricingPlanController as PricingPlanController;
 use App\Http\Controllers\BaseController as BaseController;
 use App\Http\Controllers\TranslationsController as TranslationsController;
 use App\Http\Controllers\AuthController as AuthController;
+use App\Http\Controllers\RoleController as RoleController;
+use App\Http\Controllers\SystemPermissionController as SystemPermissionController;
+use App\Http\Controllers\RoleSystemPermissionController as RoleSystemPermissionController;
+use App\Http\Controllers\UserRoleController as UserRoleController;
 
 Route::middleware('auth:sanctum')->get('/me', [MeController::class,'show']);
 Route::middleware('auth:sanctum')->post('/me', [MeController::class,'update']);
@@ -51,3 +55,9 @@ Route::get('pricing-plans/{id}', [PricingPlanController::class, 'show']);
 
 // Protected pricing plans routes (for admin operations)
 Route::middleware(['auth:sanctum'])->resource('pricing-plans', PricingPlanController::class)->except(['index', 'show', 'edit']);
+
+Route::middleware(['auth:sanctum','role-access'])->resource('roles', RoleController::class)->except(['edit']);
+Route::middleware(['auth:sanctum','role-access'])->post('roles/{id}/sync-permissions', [RoleController::class, 'syncPermissions']);
+Route::middleware(['auth:sanctum','role-access'])->resource('system-permissions', SystemPermissionController::class)->except(['edit']);
+Route::middleware(['auth:sanctum','role-access'])->resource('role-system-permissions', RoleSystemPermissionController::class)->except(['edit']);
+Route::middleware(['auth:sanctum','role-access'])->resource('user-roles', UserRoleController::class)->except(['edit']);

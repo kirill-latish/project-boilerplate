@@ -17,6 +17,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(prepend: [
             \App\Http\Middleware\ForceJsonResponse::class,
         ]);
+        $middleware->alias([
+            'role-access' => \App\Http\Middleware\RoleBasedAccess::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Tell Laravel to always render JSON for AuthenticationException
@@ -28,7 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
             }
             return false;
         });
-        
+
         // Handle AuthenticationException and ALWAYS return JSON response
         // This MUST return a response to prevent Laravel's default handler
         // from trying to redirect to route('login')
@@ -38,7 +41,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 'message' => 'Unauthenticated.',
             ], 401);
         });
-        
+
         // Set redirect callback to return empty string (not null) for all routes
         // Returning null causes Laravel to fallback to route('login')
         // Empty string prevents the fallback
